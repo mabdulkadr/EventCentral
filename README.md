@@ -72,7 +72,7 @@ EventCentral gathers Windows Event Logs from the local machine and remote server
 # 📂 Project Structure
 
 ```text
-EventCentral-Dashboard/
+EventCentral/
 │
 ├── EventCentral-Collector.ps1     # Event collection job
 ├── Run-EventCentral.ps1           # Launcher / scheduler
@@ -136,7 +136,7 @@ Command-line options override the values in the settings section.
 # 🏗️ Architecture
 
 ```text
-EventCentral-Dashboard/
+EventCentral/
 ├── Run-EventCentral.ps1           # Launcher + config (edit this one)
 ├── EventCentral-Collector.ps1     # Collection engine
 ├── EventCentral-Dashboard.html    # Interactive dashboard UI
@@ -221,6 +221,6 @@ resulting from their use.
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/mabdulkadrx)
 
-Built with [**PowerShell Enterprise Admin**](https://github.com/mabdulkadr/powershell-enterprise-admin-skill)
+Built with [**PowerShell Enterprise Admin**](https://github.com/mabdulkadr/powershell-enterprise-admin)
 
 </div>
