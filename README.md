@@ -4,15 +4,16 @@
 
 **Multi-Device Event Monitor**
 
-Collect Windows Event Logs from your PC and remote servers (WinRM), archive them forever, and explore them in an interactive browser dashboard.
+Collect Windows Event Logs from this PC and remote servers over WinRM, keep them in a local archive, and browse them in a dashboard opened in your browser.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![PowerShell](https://img.shields.io/badge/powershell-5.1%2B-blue.svg)
-![Platform](https://img.shields.io/badge/Windows-10%2F11-blue.svg)
-![Dashboard](https://img.shields.io/badge/Dashboard-Web-lightgrey.svg)
-![Version](https://img.shields.io/badge/version-1.0-green.svg)
+[![Mode](https://img.shields.io/badge/Mode-CLI-334155?style=for-the-badge)](#-usage)
+[![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE?style=for-the-badge&logo=powershell&logoColor=white)](https://learn.microsoft.com/en-us/powershell/)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0F172A?style=for-the-badge)](#%EF%B8%8F-requirements)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Web-3B82F6?style=for-the-badge)](#-overview)
+[![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge)](#-license)
+[![Version](https://img.shields.io/badge/Version-1.0-334155?style=for-the-badge)](#-overview)
 
-[Features](#-core-features) • [Usage](#-usage) • [Architecture](#️-architecture) • [Troubleshooting](#-troubleshooting)
+[Overview](#-overview) • [Features](#-core-features) • [Usage](#-usage) • [Architecture](#%EF%B8%8F-architecture) • [Troubleshooting](#-troubleshooting) • [License](#-license)
 
 </div>
 
@@ -20,51 +21,67 @@ Collect Windows Event Logs from your PC and remote servers (WinRM), archive them
 
 # 📖 Overview
 
-**EventCentral** is a multi-device Windows Event Log monitoring dashboard. It collects events from your PC and remote servers via WinRM, discovers **all** event logs, and displays them in an interactive browser dashboard. Events accumulate forever — every scan merges new events into the archive without deleting old data.
+EventCentral gathers Windows Event Logs from the local machine and remote servers through WinRM, finds all event logs on each device, and shows them in an interactive browser dashboard. Each scan adds new events to the archive and keeps the old ones.
 
-> ✅ No agents &nbsp;·&nbsp; ✅ No databases &nbsp;·&nbsp; ✅ No dependencies &nbsp;·&nbsp; 🔒 Your data stays on your machine
+> No agents, no database server, and no package installs. All files stay on your machine.
 
 ---
 
 ## 🖼️ Screenshots
 
-![EventCentral dashboard — timeline chart, device health chips, log tree sidebar, and the filterable event table](Screenshot.png)
+![EventCentral dashboard with timeline chart, device health chips, log tree, and event table](Screenshot.png)
 
-*Dashboard: summary cards, per-device timeline chart, collapsible log tree, device health chips, and the sortable event table with Event History.*
+*Dashboard with summary cards, a per-device timeline, a collapsible log tree, device health chips, and the sortable event table.*
 
 ---
 
 # ✨ Core Features
 
 ### 🔹 Collection Engine
-* **Incremental with catch-up** — every scan re-covers the look-back window; devices that fell behind start from their stored position, so no events are lost
-* **Never deletes data** — `events.json` grows into a complete historical archive
-* **Deduplication** — unique key `Time + EventID + Log + Machine + MD5(message hash)` prevents duplicates even for same-second events
-* **Multi-device** — collect from localhost + remote servers via WinRM (`Invoke-Command`)
-* **Full log discovery** — `Get-WinEvent -ListLog *` finds every log that contains events
-* **Scan scope** — `Basic` (standard logs) / `Advanced` (+ service logs) / `All` (every log)
-* **Friendly remote errors** — ACCESS DENIED / WINRM NOT ENABLED / TIMEOUT / NETWORK ERROR classified automatically
-* **Resilient merge** — failed devices keep their scan position, so their missed window is re-collected next run
+* Each scan covers a look-back window, and devices that fell behind resume from their saved position. Events are not skipped
+* `events.json` keeps growing. Scans merge new rows instead of deleting old ones
+* A unique key made from time, EventID, Log, Machine, and an MD5 hash of the message prevents duplicates, including events in the same second
+* Collect from localhost and remote servers with `Invoke-Command` over WinRM
+* `Get-WinEvent -ListLog *` finds every log that holds events
+* Pick a scope: Basic for standard logs, Advanced to add service logs, or All for every log
+* Remote errors are labeled as ACCESS DENIED, WINRM NOT ENABLED, TIMEOUT, or NETWORK ERROR
+* If a device fails, its scan position is kept so the missed window is collected next time
 
 ### 🔹 Dashboard
-* **Summary cards** — Total / Critical / Error / Warning / Info
-* **Unified time filter** — `15m / 1h / 6h / 24h / 7d / 14d / 30d` presets + custom date pickers
-* **Timeline chart** — multi-line Chart.js, events per hour per device, hover-to-filter & click-to-pin
-* **Sortable + filterable table** with infinite scroll
-* **Dynamic Levels filter** — dropdown only shows levels present in the data, in canonical order
-* **Sidebar** — collapsible log tree matching the Event Viewer layout, with live search
-* **Device health** — color-coded chips 🟢 Green / 🟠 Orange / 🔴 Red based on thresholds
-* **Cross-device shared events** — detect the same Event ID across multiple devices
-* **Event History** — click any event to see ALL its past occurrences (chart + average recurrence interval)
-* **KB reference** — ~70 built-in entries for common Windows Event IDs
-* **Dark / Light theme** — persists via `localStorage`
-* **CSV export** — download filtered events
-* **Keyboard shortcuts** — `Ctrl+F` Search · `Ctrl+E` Export · `Esc` Close
+* Summary cards for total, critical, error, warning, and info events
+* Time presets from 15 minutes to 30 days, plus custom date pickers
+* A Chart.js timeline with events per hour per device. Hover to filter, click to pin
+* A sortable, filterable table with infinite scroll
+* A level dropdown that only lists levels present in the data, in canonical order
+* A sidebar with a collapsible log tree and live search, laid out like Event Viewer
+* Device health chips in green, orange, and red based on thresholds
+* Detection of the same Event ID appearing on several devices
+* Event History: click an event to see all its past occurrences and the average gap between them
+* Around 70 built-in references for common Windows Event IDs
+* Light and dark themes, remembered in `localStorage`
+* CSV export for the filtered rows
+* Keyboard shortcuts: `Ctrl+F` to search, `Ctrl+E` to export, `Esc` to close
 
 ### 🔹 Data & Storage
-* **`events.json` is the database** — the dashboard reads it first and updates live
-* **Embedded snapshot** — the HTML mirrors the archive so it also works offline from disk (`file://`)
-* **`last_scan.json`** — per-device scan state for incremental runs
+* `events.json` is the archive. The dashboard reads it first and refreshes from it
+* The HTML also carries an embedded snapshot, so it works offline from `file://`
+* `last_scan.json` stores the scan position for each device
+
+---
+
+# 📂 Project Structure
+
+```text
+EventCentral-Dashboard/
+│
+├── EventCentral-Collector.ps1     # Event collection job
+├── Run-EventCentral.ps1           # Launcher / scheduler
+├── EventCentral-Dashboard.html    # Interactive browser dashboard
+├── events.json                    # Event archive
+├── last_scan.json                 # Last scan metadata
+├── Screenshot.png                 # Documentation screenshot
+└── README.md
+```
 
 ---
 
@@ -74,14 +91,14 @@ Collect Windows Event Logs from your PC and remote servers (WinRM), archive them
 .\Run-EventCentral.ps1
 ```
 
-Or double-click **Run-EventCentral.ps1** in File Explorer.
+You can also double-click **Run-EventCentral.ps1** in File Explorer.
 
 ### Steps
 
-1. **Configure Settings** — open `Run-EventCentral.ps1` and edit the `⚙️ YOUR SETTINGS` section (devices, hours, scope, thresholds)
-2. **Run the Launcher** — collects events and opens the dashboard
-3. **Explore** — filter by time, log, device, level; click any event for full details and history
-4. **Export** — press `Ctrl+E` to download the filtered rows as CSV
+1. Open `Run-EventCentral.ps1` and edit the `⚙️ YOUR SETTINGS` section for devices, hours, scope, and thresholds
+2. Run the launcher. It collects events and opens the dashboard
+3. Filter by time, log, device, or level. Click any event for details and history
+4. Press `Ctrl+E` to export the filtered rows to CSV
 
 ### Configuration Examples
 
@@ -99,7 +116,7 @@ Or double-click **Run-EventCentral.ps1** in File Explorer.
 .\Run-EventCentral.ps1 -CriticalThreshold 3 -ErrorThreshold 10
 ```
 
-> ⚙️ Any option passed on the command line overrides the value in the settings section.
+Command-line options override the values in the settings section.
 
 ---
 
@@ -109,10 +126,10 @@ Or double-click **Run-EventCentral.ps1** in File Explorer.
 |-------------|---------|
 | **OS** | Windows 10 / 11 / Server 2016+ |
 | **PowerShell** | 5.1 or later |
-| **Permissions** | Administrator (for the Security log + remote scans) |
+| **Permissions** | Administrator, for the Security log and remote scans |
 | **Remote servers** | WinRM enabled: `Enable-PSRemoting -Force` |
-| **Browser** | Modern browser (Chrome, Edge, Firefox) |
-| **Network** | Internet needed once for Google Fonts + Chart.js CDN |
+| **Browser** | Chrome, Edge, or Firefox |
+| **Network** | Internet once, to load Google Fonts and Chart.js from their CDN |
 
 ---
 
@@ -143,11 +160,11 @@ EventCentral-Collector.ps1 ────► events.json ◄──── (database
 
 ### Auto-Detection Behavior
 
-* **Log discovery** — every log containing events is found automatically via `Get-WinEvent -ListLog *`
-* **Device default** — if no devices are configured, the local machine is used
-* **Level mapping** — numeric event levels map to friendly names (Critical / Error / Warning / Information / Verbose)
-* **Machine name normalization** — DNS suffixes are stripped and names uppercased, so `pc-1.corp.local` and `PC-1` resolve to the same device
-* **Dashboard refresh** — when enabled, fresh data is injected into the HTML automatically after each collection
+* Every log with events is found through `Get-WinEvent -ListLog *`
+* If no devices are configured, the local machine is used
+* Numeric event levels become Critical, Error, Warning, Information, or Verbose
+* DNS suffixes are stripped and names uppercased, so `pc-1.corp.local` and `PC-1` count as one device
+* When refresh is enabled, the HTML is updated with the new data after each collection
 
 ---
 
@@ -156,27 +173,27 @@ EventCentral-Collector.ps1 ────► events.json ◄──── (database
 | Symptom | Likely Cause | Fix |
 |---------|--------------|-----|
 | Remote scan: ACCESS DENIED | Not running as Administrator | Run the launcher elevated |
-| Remote scan: WINRM NOT ENABLED | Remoting off on the target | `Enable-PSRemoting -Force` on the target |
-| Remote scan: TIMEOUT | Target offline or firewalled | `Test-NetConnection <host> -Port 5985` |
-| Security log empty | Admin rights missing | Run elevated — the Security log requires admin |
-| Dashboard shows old data | `-SkipRefresh` was used | Re-run without `-SkipRefresh`, or open the HTML to re-embed |
-| Fonts/charts missing | No internet on first load | Chart.js + Google Fonts load from CDN once, then cache |
+| Remote scan: WINRM NOT ENABLED | Remoting off on the target | Run `Enable-PSRemoting -Force` on the target |
+| Remote scan: TIMEOUT | Target offline or firewalled | Run `Test-NetConnection <host> -Port 5985` |
+| Security log empty | Missing admin rights | Run elevated. The Security log needs admin |
+| Dashboard shows old data | `-SkipRefresh` was used | Re-run without it, or open the HTML to re-embed the data |
+| Fonts or charts missing | No internet on first load | Chart.js and Google Fonts load from a CDN once, then cache |
 
 ---
 
 # 🛡 Operational Notes
 
-* **Data privacy** — everything stays on your machine: `events.json`, the dashboard, and scan state are local files; no telemetry, no cloud
-* **Admin scope** — run elevated only when needed (Security log + remote scans); the collector reads logs, it never modifies system state
-* **WinRM hardening** — enable remoting only on trusted hosts and keep firewall rules scoped to your management subnet
-* **Archive growth** — `events.json` grows forever by design; archive or rotate it periodically if disk space matters
-* **Staging first** — test scan scope and thresholds on a pilot device before pointing it at production servers
+* `events.json`, the dashboard, and the scan state are local files. No telemetry or cloud service is involved
+* Run elevated only when you need the Security log or remote scans. The collector reads logs and does not change system state
+* Enable WinRM only on trusted hosts, and scope firewall rules to your management subnet
+* `events.json` grows by design. Archive or rotate it if disk space becomes a concern
+* Try the scan scope and thresholds on a pilot device before pointing the tool at production servers
 
 ---
 
 ## 👤 Author
 
-**Mohammad Abdulkader Omar**  
+**Mohammad Abdelkader Omar**  
 GitHub: [@mabdulkadr](https://github.com/mabdulkadr)  
 Website: [momar.tech](https://momar.tech)  
 
@@ -196,7 +213,6 @@ production. The authors assume no liability for any damage or data loss
 resulting from their use.
 
 ---
-
 <div align="center">
 
 ⭐ **If this tool saves you time, star the repo — it helps others find it.**
